@@ -3,34 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sort Explorer | Aprendendo Algoritmos</title>
+    <title>Sort Explorer | Didática Visual</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+            --bg-color: #0b0f1a;
+            --card-bg: #161b2a;
             --primary: #38bdf8;
             --secondary: #818cf8;
             --accent: #f472b6;
             --success: #4ade80;
             --warning: #fbbf24;
+            --purple: #a855f7;
             --text: #f1f5f9;
             --text-dim: #94a3b8;
-            --border: #334155;
+            --border: #2d3748;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text);
             min-height: 100vh;
-            padding: 2rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -38,44 +34,35 @@
 
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             max-width: 800px;
         }
 
         h1 {
             font-family: 'Fira Code', monospace;
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
             color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        p.subtitle {
-            color: var(--text-dim);
-            line-height: 1.6;
+            margin-bottom: 0.5rem;
         }
 
         .controls {
             background: var(--card-bg);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.2rem;
+            width: 100%;
+            max-width: 1000px;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
 
         label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--secondary);
@@ -83,59 +70,42 @@
         }
 
         input, select {
-            background: var(--bg-color);
+            background: #0f172a;
             border: 1px solid var(--border);
             color: white;
-            padding: 0.6rem;
-            border-radius: 6px;
+            padding: 0.7rem;
+            border-radius: 8px;
             outline: none;
             font-family: 'Fira Code', monospace;
+            width: 100%;
         }
 
         button {
             background: var(--primary);
-            color: var(--bg-color);
+            color: #000;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            font-weight: bold;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        button:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-        }
-
-        button.secondary {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
         }
 
         .main-container {
-            display: flex;
-            gap: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
             width: 100%;
             max-width: 1200px;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .sort-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.5rem;
-            flex: 1;
-            min-width: 320px;
-            display: none; /* Hidden by default */
-        }
-
-        .sort-card.active {
+            padding: 1.2rem;
+            position: relative;
             display: flex;
             flex-direction: column;
         }
@@ -144,103 +114,85 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.5rem;
         }
 
-        .sort-name {
+        .sort-name { font-family: 'Fira Code', monospace; color: var(--accent); font-size: 0.9rem; }
+        
+        .timer-badge {
             font-family: 'Fira Code', monospace;
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: var(--border);
+            font-size: 0.8rem;
+            color: var(--primary);
         }
 
         .numbers-display {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            min-height: 80px;
-            align-items: center;
+            margin: 1.5rem 0;
             flex-wrap: wrap;
         }
 
         .num-box {
-            width: 45px;
-            height: 45px;
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-color);
+            background: rgba(0,0,0,0.3);
             border: 2px solid var(--border);
             border-radius: 8px;
             font-family: 'Fira Code', monospace;
-            font-size: 1.2rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            transition: all 0.2s;
+            font-weight: bold;
         }
 
-        .num-box.comparing {
-            border-color: var(--warning);
-            background: rgba(251, 191, 36, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .num-box.swapping {
-            border-color: var(--accent);
-            background: rgba(244, 114, 182, 0.2);
-            scale: 1.1;
-        }
-
-        .num-box.sorted {
-            border-color: var(--success);
-            color: var(--success);
-        }
+        .num-box.comparing { border-color: var(--warning); background: rgba(251, 191, 36, 0.1); }
+        .num-box.swapping { border-color: var(--accent); background: rgba(244, 114, 182, 0.2); transform: scale(1.1); }
+        .num-box.min-found { border-color: var(--purple); background: rgba(168, 85, 247, 0.2); box-shadow: 0 0 10px var(--purple); }
+        .num-box.sorted { border-color: var(--success); color: var(--success); }
 
         .explanation {
-            background: rgba(0,0,0,0.2);
+            background: #0b0f1a;
             padding: 1rem;
             border-radius: 8px;
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.85rem;
+            line-height: 1.4;
             min-height: 80px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .code-style {
-            font-family: 'Fira Code', monospace;
+            border-left: 3px solid var(--primary);
             color: var(--text-dim);
-            font-size: 0.8rem;
         }
 
-        .highlight-code {
-            color: var(--primary);
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--warning);
+            color: black;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: none;
+            z-index: 10;
         }
 
-        @media (max-width: 768px) {
-            .controls { flex-direction: column; align-items: stretch; }
-            body { padding: 1rem; }
-        }
+        .highlight { font-weight: bold; color: var(--primary); }
+        .h-purple { color: var(--purple); font-weight: bold; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>{ sort_explorer }</h1>
-        <p class="subtitle">Descubra como os computadores organizam dados de forma visual e interativa. Criado para mentes curiosas do 8º ano.</p>
     </header>
 
     <div class="controls">
         <div class="input-group">
-            <label>Nº de Itens</label>
-            <input type="number" id="listSize" value="8" min="3" max="15">
+            <label>Nº de Itens (4-15)</label>
+            <input type="number" id="listSize" value="8" min="4" max="15">
         </div>
         <div class="input-group">
             <label>Algoritmo</label>
@@ -251,187 +203,224 @@
                 <option value="compare">Comparar Todos</option>
             </select>
         </div>
-        <button onclick="prepareSimulation()">Gerar e Iniciar</button>
+        <div class="input-group">
+            <label>Velocidade</label>
+            <input type="range" id="speed" min="100" max="2000" value="800" style="direction: rtl;">
+        </div>
+        <button onclick="startSimulation()">Iniciar</button>
     </div>
 
-    <div class="main-container" id="visualizerContainer">
-        <!-- Os cards de sort entrarão aqui via JavaScript -->
-    </div>
+    <div class="main-container" id="container"></div>
 
     <script>
-        let isRunning = false;
-        let originalList = [];
+        let currentSession = 0;
+        let results = [];
+        let isComparing = false;
 
-        // Velocidade da animação (ms)
-        const SPEED = 800;
+        // Validação imediata do input de tamanho
+        document.getElementById('listSize').addEventListener('change', function() {
+            if (this.value > 15) this.value = 15;
+            if (this.value < 4) this.value = 4;
+        });
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+        function sleep() {
+            return new Promise(resolve => setTimeout(resolve, document.getElementById('speed').value));
         }
 
-        function generateRandomList(size) {
-            return Array.from({ length: size }, () => Math.floor(Math.random() * 90) + 10);
+        function generateUniqueList(size) {
+            let set = new Set();
+            while(set.size < size) set.add(Math.floor(Math.random() * 89) + 10);
+            return Array.from(set);
         }
 
-        function createSortCard(id, title) {
+        function createCard(id, name) {
             return `
-                <div class="sort-card active" id="card-${id}">
+                <div class="sort-card" id="card-${id}">
+                    <div class="rank-badge" id="rank-${id}"></div>
                     <div class="sort-header">
-                        <span class="sort-name">// ${title}</span>
-                        <span class="status-badge" id="status-${id}">Aguardando</span>
+                        <span class="sort-name">// ${name}</span>
+                        <span class="timer-badge" id="time-${id}">0.00s</span>
                     </div>
                     <div class="numbers-display" id="display-${id}"></div>
-                    <div class="explanation" id="exp-${id}">
-                        Clique em gerar para iniciar a explicação passo a passo.
-                    </div>
+                    <div class="explanation" id="exp-${id}">Aguardando...</div>
                 </div>
             `;
         }
 
-        function renderNumbers(id, arr, activeIndices = [], swappingIndices = [], sortedIndices = []) {
+        function render(id, arr, states = {}) {
             const container = document.getElementById(`display-${id}`);
-            container.innerHTML = '';
-            arr.forEach((val, idx) => {
-                const box = document.createElement('div');
-                box.className = 'num-box';
-                box.textContent = val;
-                if (swappingIndices.includes(idx)) box.classList.add('swapping');
-                else if (activeIndices.includes(idx)) box.classList.add('comparing');
-                if (sortedIndices.includes(idx)) box.classList.add('sorted');
-                container.appendChild(box);
-            });
+            if(!container) return;
+            
+            const { active = [], swapping = [], sorted = [], minIdx = null } = states;
+
+            container.innerHTML = arr.map((val, idx) => {
+                let cls = 'num-box';
+                if (swapping.includes(idx)) cls += ' swapping';
+                else if (idx === minIdx) cls += ' min-found';
+                else if (active.includes(idx)) cls += ' comparing';
+                
+                if (sorted.includes(idx)) cls += ' sorted';
+                return `<div class="${cls}">${val}</div>`;
+            }).join('');
         }
 
-        async function prepareSimulation() {
-            if (isRunning) return;
-            
-            const size = parseInt(document.getElementById('listSize').value);
-            const algo = document.getElementById('algorithm').value;
-            const container = document.getElementById('visualizerContainer');
-            
-            if (size > 15) { alert("Máximo de 15 itens para melhor visualização!"); return; }
+        function updateExp(id, msg) {
+            const el = document.getElementById(`exp-${id}`);
+            if(el) el.innerHTML = `<span>> </span>${msg}`;
+        }
 
-            isRunning = true;
+        async function startSimulation() {
+            currentSession++;
+            const session = currentSession;
+            
+            // Re-valida o tamanho antes de começar
+            let sizeInput = document.getElementById('listSize');
+            if (sizeInput.value > 15) sizeInput.value = 15;
+            if (sizeInput.value < 4) sizeInput.value = 4;
+            
+            const size = parseInt(sizeInput.value);
+            const mode = document.getElementById('algorithm').value;
+            isComparing = (mode === 'compare');
+            
+            const container = document.getElementById('container');
             container.innerHTML = '';
-            originalList = generateRandomList(size);
+            results = [];
 
-            if (algo === 'compare') {
-                container.innerHTML += createSortCard('bubble', 'Bubble Sort');
-                container.innerHTML += createSortCard('selection', 'Selection Sort');
-                container.innerHTML += createSortCard('insertion', 'Insertion Sort');
-                
-                // Roda as 3 ao mesmo tempo
-                Promise.all([
-                    bubbleSort([...originalList], 'bubble'),
-                    selectionSort([...originalList], 'selection'),
-                    insertionSort([...originalList], 'insertion')
-                ]).then(() => isRunning = false);
+            const list = generateUniqueList(size);
+
+            if (isComparing) {
+                container.innerHTML = createCard('bubble', 'Bubble Sort') + 
+                                    createCard('selection', 'Selection Sort') + 
+                                    createCard('insertion', 'Insertion Sort');
+                bubbleSort([...list], 'bubble', session);
+                selectionSort([...list], 'selection', session);
+                insertionSort([...list], 'insertion', session);
             } else {
                 const names = {bubble: 'Bubble Sort', selection: 'Selection Sort', insertion: 'Insertion Sort'};
-                container.innerHTML += createSortCard(algo, names[algo]);
-                if(algo === 'bubble') await bubbleSort([...originalList], 'bubble');
-                if(algo === 'selection') await selectionSort([...originalList], 'selection');
-                if(algo === 'insertion') await insertionSort([...originalList], 'insertion');
-                isRunning = false;
+                container.innerHTML = createCard(mode, names[mode]);
+                if(mode === 'bubble') bubbleSort([...list], 'bubble', session);
+                if(mode === 'selection') selectionSort([...list], 'selection', session);
+                if(mode === 'insertion') insertionSort([...list], 'insertion', session);
             }
         }
 
-        async function updateExp(id, msg) {
-            document.getElementById(`exp-${id}`).innerHTML = `<span class="code-style">> </span>${msg}`;
+        function startTimer(id, session) {
+            let start = performance.now();
+            let timerInterval = setInterval(() => {
+                if (session !== currentSession || document.getElementById(`exp-${id}`).innerText.includes("Finalizado")) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                let now = performance.now();
+                document.getElementById(`time-${id}`).textContent = ((now - start) / 1000).toFixed(2) + 's';
+            }, 50);
+            return start;
         }
 
-        // --- ALGORITMOS ---
+        function handleFinish(id, startTime, session) {
+            if (session !== currentSession) return;
+            const duration = (performance.now() - startTime) / 1000;
+            updateExp(id, "<b>Finalizado</b>");
+            
+            if (isComparing) {
+                results.push({ id, duration });
+                results.sort((a, b) => a.duration - b.duration);
+                results.forEach((res, index) => {
+                    const badge = document.getElementById(`rank-${res.id}`);
+                    if(badge) {
+                        badge.style.display = 'block';
+                        badge.textContent = `${index + 1}º Lugar`;
+                        badge.style.background = index === 0 ? 'var(--success)' : 'var(--warning)';
+                    }
+                });
+            }
+        }
 
-        async function bubbleSort(arr, id) {
-            const n = arr.length;
-            let sortedIndices = [];
-            document.getElementById(`status-${id}`).textContent = "Ordenando...";
-
+        async function bubbleSort(arr, id, session) {
+            const start = startTimer(id, session);
+            let n = arr.length;
+            let sorted = [];
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n - i - 1; j++) {
-                    await updateExp(id, `Comparando <span class="highlight-code">${arr[j]}</span> e <span class="highlight-code">${arr[j+1]}</span>. O maior "flutua" para a direita.`);
-                    renderNumbers(id, arr, [j, j + 1], [], sortedIndices);
-                    await sleep(SPEED);
-
-                    if (arr[j] > arr[j + 1]) {
-                        await updateExp(id, `<span class="highlight-code">${arr[j]}</span> é maior que <span class="highlight-code">${arr[j+1]}</span>, trocando de lugar!`);
-                        renderNumbers(id, arr, [], [j, j + 1], sortedIndices);
-                        await sleep(SPEED);
-                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                        renderNumbers(id, arr, [j, j + 1], [], sortedIndices);
-                        await sleep(SPEED);
+                    if (session !== currentSession) return;
+                    updateExp(id, `Comparando <span class="highlight">${arr[j]}</span> e <span class="highlight">${arr[j+1]}</span>.`);
+                    render(id, arr, { active: [j, j+1], sorted });
+                    await sleep();
+                    if (arr[j] > arr[j+1]) {
+                        updateExp(id, `Troca: <span class="highlight">${arr[j]}</span> é maior que <span class="highlight">${arr[j+1]}</span>.`);
+                        render(id, arr, { swapping: [j, j+1], sorted });
+                        await sleep();
+                        [arr[j], arr[j+1]] = [arr[j+1], arr[j]];
+                        render(id, arr, { active: [j, j+1], sorted });
+                        await sleep();
                     }
                 }
-                sortedIndices.push(n - 1 - i);
-                renderNumbers(id, arr, [], [], sortedIndices);
+                sorted.push(n - 1 - i);
             }
-            await updateExp(id, "Lista ordenada! O maior elemento de cada iteração foi colocado ao final.");
-            document.getElementById(`status-${id}`).textContent = "Concluído";
+            handleFinish(id, start, session);
+            render(id, arr, { sorted: Array.from(arr.keys()) });
         }
 
-        async function selectionSort(arr, id) {
-            const n = arr.length;
-            let sortedIndices = [];
-            document.getElementById(`status-${id}`).textContent = "Ordenando...";
-
+        async function selectionSort(arr, id, session) {
+            const start = startTimer(id, session);
+            let n = arr.length;
+            let sorted = [];
             for (let i = 0; i < n; i++) {
                 let minIdx = i;
-                await updateExp(id, `Buscando o menor valor a partir da posição ${i}...`);
-                
+                updateExp(id, `Iniciando busca pelo menor valor.`);
+                render(id, arr, { active: [i], sorted, minIdx });
+                await sleep();
                 for (let j = i + 1; j < n; j++) {
-                    renderNumbers(id, arr, [j, minIdx], [], sortedIndices);
-                    await sleep(SPEED / 2);
+                    if (session !== currentSession) return;
+                    updateExp(id, `Comparando com <span class="highlight">${arr[j]}</span>. Menor atual: <span class="h-purple">${arr[minIdx]}</span>.`);
+                    render(id, arr, { active: [j], sorted, minIdx });
+                    await sleep();
                     if (arr[j] < arr[minIdx]) {
                         minIdx = j;
-                        await updateExp(id, `Encontramos um novo valor menor: <span class="highlight-code">${arr[minIdx]}</span>.`);
+                        updateExp(id, `Novo menor encontrado: <span class="h-purple">${arr[minIdx]}</span>!`);
+                        render(id, arr, { active: [j], sorted, minIdx });
+                        await sleep();
                     }
                 }
-
                 if (minIdx !== i) {
-                    await updateExp(id, `Trocando o menor valor <span class="highlight-code">${arr[minIdx]}</span> com o início <span class="highlight-code">${arr[i]}</span>.`);
-                    renderNumbers(id, arr, [], [i, minIdx], sortedIndices);
-                    await sleep(SPEED);
+                    updateExp(id, `Trocando o menor <span class="h-purple">${arr[minIdx]}</span> com a posição <span class="highlight">${i}</span>.`);
+                    render(id, arr, { swapping: [i, minIdx], sorted });
+                    await sleep();
                     [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
                 }
-                sortedIndices.push(i);
-                renderNumbers(id, arr, [], [], sortedIndices);
-                await sleep(SPEED);
+                sorted.push(i);
+                render(id, arr, { sorted });
             }
-            await updateExp(id, "Ordenado! Sempre buscamos o menor e colocamos na primeira posição livre.");
-            document.getElementById(`status-${id}`).textContent = "Concluído";
+            handleFinish(id, start, session);
         }
 
-        async function insertionSort(arr, id) {
-            const n = arr.length;
-            let sortedIndices = [0];
-            document.getElementById(`status-${id}`).textContent = "Ordenando...";
-            renderNumbers(id, arr, [], [], [0]);
-
+        async function insertionSort(arr, id, session) {
+            const start = startTimer(id, session);
+            let n = arr.length;
+            let sorted = [0];
             for (let i = 1; i < n; i++) {
                 let key = arr[i];
                 let j = i - 1;
-                
-                await updateExp(id, `Pegamos o número <span class="highlight-code">${key}</span> e vamos encaixá-lo na parte ordenada.`);
-                renderNumbers(id, arr, [i], [], sortedIndices);
-                await sleep(SPEED);
-
+                updateExp(id, `Pegamos o <span class="highlight">${key}</span> para inserir na ordem.`);
+                render(id, arr, { active: [i], sorted });
+                await sleep();
                 while (j >= 0 && arr[j] > key) {
-                    await updateExp(id, `<span class="highlight-code">${arr[j]}</span> é maior que <span class="highlight-code">${key}</span>, movendo para a direita.`);
-                    arr[j + 1] = arr[j];
-                    renderNumbers(id, arr, [j], [j+1], sortedIndices);
-                    j = j - 1;
-                    await sleep(SPEED);
+                    if (session !== currentSession) return;
+                    updateExp(id, `Movendo <span class="highlight">${arr[j]}</span> para abrir espaço.`);
+                    arr[j+1] = arr[j];
+                    render(id, arr, { active: [j], swapping: [j+1], sorted });
+                    j--;
+                    await sleep();
                 }
-                arr[j + 1] = key;
-                sortedIndices = Array.from({length: i + 1}, (_, k) => k);
-                await updateExp(id, `Encaixamos o <span class="highlight-code">${key}</span> na posição correta.`);
-                renderNumbers(id, arr, [], [j + 1], sortedIndices);
-                await sleep(SPEED);
+                arr[j+1] = key;
+                sorted = Array.from({length: i+1}, (_, k) => k);
+                updateExp(id, `Encaixamos o <span class="highlight">${key}</span> na posição correta.`);
+                render(id, arr, { swapping: [j+1], sorted });
+                await sleep();
             }
-            await updateExp(id, "Ordenado! Como organizar cartas na mão: pegamos uma e inserimos no lugar certo.");
-            document.getElementById(`status-${id}`).textContent = "Concluído";
+            handleFinish(id, start, session);
+            render(id, arr, { sorted: Array.from(arr.keys()) });
         }
-
     </script>
 </body>
 </html>
