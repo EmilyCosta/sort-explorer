@@ -92,6 +92,8 @@
             text-transform: uppercase;
         }
 
+        button:hover { filter: brightness(1.1); }
+
         .main-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -196,7 +198,7 @@
         </div>
         <div class="input-group">
             <label>Algoritmo</label>
-            <select id="algorithm">
+            <select id="algorithm" onchange="resetToDefault()">
                 <option value="bubble">Bubble Sort</option>
                 <option value="insertion">Insertion Sort</option>
                 <option value="selection">Selection Sort</option>
@@ -216,12 +218,52 @@
         let currentSession = 0;
         let results = [];
         let isComparing = false;
+        let useDefaultList = true; 
+        const defaultList = [4, 5, 6, 1, 8, 7, 2, 3];
 
-        // Validação imediata do input de tamanho
-        document.getElementById('listSize').addEventListener('change', function() {
+        // Inicialização ao carregar a página
+        window.onload = () => {
+            resetToDefault();
+        };
+
+        // Reseta tudo para o estado padrão (Lista específica e 8 itens)
+        function resetToDefault() {
+            currentSession++; // Interrompe animações
+            useDefaultList = true;
+            document.getElementById('listSize').value = 8;
+            updateView(defaultList);
+        }
+
+        // Chamado quando o usuário mexe no número de itens manualmente
+        document.getElementById('listSize').addEventListener('input', function() {
+            currentSession++; // Interrompe animações ao mudar número
+            useDefaultList = false;
             if (this.value > 15) this.value = 15;
             if (this.value < 4) this.value = 4;
+            
+            // Gera uma prévia aleatória para o usuário ver
+            let previewList = generateUniqueList(parseInt(this.value));
+            updateView(previewList);
         });
+
+        function updateView(list) {
+            const mode = document.getElementById('algorithm').value;
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            
+            if (mode === 'compare') {
+                container.innerHTML = createCard('bubble', 'Bubble Sort') + 
+                                    createCard('selection', 'Selection Sort') + 
+                                    createCard('insertion', 'Insertion Sort');
+                render('bubble', list);
+                render('selection', list);
+                render('insertion', list);
+            } else {
+                const names = {bubble: 'Bubble Sort', selection: 'Selection Sort', insertion: 'Insertion Sort'};
+                container.innerHTML = createCard(mode, names[mode]);
+                render(mode, list);
+            }
+        }
 
         function sleep() {
             return new Promise(resolve => setTimeout(resolve, document.getElementById('speed').value));
@@ -242,7 +284,7 @@
                         <span class="timer-badge" id="time-${id}">0.00s</span>
                     </div>
                     <div class="numbers-display" id="display-${id}"></div>
-                    <div class="explanation" id="exp-${id}">Aguardando...</div>
+                    <div class="explanation" id="exp-${id}">Aguardando início...</div>
                 </div>
             `;
         }
@@ -250,15 +292,12 @@
         function render(id, arr, states = {}) {
             const container = document.getElementById(`display-${id}`);
             if(!container) return;
-            
             const { active = [], swapping = [], sorted = [], minIdx = null } = states;
-
             container.innerHTML = arr.map((val, idx) => {
                 let cls = 'num-box';
                 if (swapping.includes(idx)) cls += ' swapping';
                 else if (idx === minIdx) cls += ' min-found';
                 else if (active.includes(idx)) cls += ' comparing';
-                
                 if (sorted.includes(idx)) cls += ' sorted';
                 return `<div class="${cls}">${val}</div>`;
             }).join('');
@@ -272,32 +311,26 @@
         async function startSimulation() {
             currentSession++;
             const session = currentSession;
-            
-            // Re-valida o tamanho antes de começar
-            let sizeInput = document.getElementById('listSize');
-            if (sizeInput.value > 15) sizeInput.value = 15;
-            if (sizeInput.value < 4) sizeInput.value = 4;
-            
-            const size = parseInt(sizeInput.value);
             const mode = document.getElementById('algorithm').value;
+            const sizeInput = document.getElementById('listSize');
             isComparing = (mode === 'compare');
-            
-            const container = document.getElementById('container');
-            container.innerHTML = '';
             results = [];
 
-            const list = generateUniqueList(size);
+            let list;
+            if (useDefaultList && parseInt(sizeInput.value) === 8) {
+                list = [...defaultList];
+            } else {
+                list = generateUniqueList(parseInt(sizeInput.value));
+            }
+
+            // Atualiza a tela com a lista que será usada antes de começar
+            updateView(list);
 
             if (isComparing) {
-                container.innerHTML = createCard('bubble', 'Bubble Sort') + 
-                                    createCard('selection', 'Selection Sort') + 
-                                    createCard('insertion', 'Insertion Sort');
                 bubbleSort([...list], 'bubble', session);
                 selectionSort([...list], 'selection', session);
                 insertionSort([...list], 'insertion', session);
             } else {
-                const names = {bubble: 'Bubble Sort', selection: 'Selection Sort', insertion: 'Insertion Sort'};
-                container.innerHTML = createCard(mode, names[mode]);
                 if(mode === 'bubble') bubbleSort([...list], 'bubble', session);
                 if(mode === 'selection') selectionSort([...list], 'selection', session);
                 if(mode === 'insertion') insertionSort([...list], 'insertion', session);
@@ -336,10 +369,10 @@
             }
         }
 
+        // Algoritmos (Mantidos conforme solicitado)
         async function bubbleSort(arr, id, session) {
             const start = startTimer(id, session);
-            let n = arr.length;
-            let sorted = [];
+            let n = arr.length; let sorted = [];
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n - i - 1; j++) {
                     if (session !== currentSession) return;
@@ -363,21 +396,20 @@
 
         async function selectionSort(arr, id, session) {
             const start = startTimer(id, session);
-            let n = arr.length;
-            let sorted = [];
+            let n = arr.length; let sorted = [];
             for (let i = 0; i < n; i++) {
                 let minIdx = i;
-                updateExp(id, `Iniciando busca pelo menor valor.`);
+                updateExp(id, `Buscando o menor valor.`);
                 render(id, arr, { active: [i], sorted, minIdx });
                 await sleep();
                 for (let j = i + 1; j < n; j++) {
                     if (session !== currentSession) return;
-                    updateExp(id, `Comparando com <span class="highlight">${arr[j]}</span>. Menor atual: <span class="h-purple">${arr[minIdx]}</span>.`);
+                    updateExp(id, `Comparando com <span class="highlight">${arr[j]}</span>. Menor: <span class="h-purple">${arr[minIdx]}</span>.`);
                     render(id, arr, { active: [j], sorted, minIdx });
                     await sleep();
                     if (arr[j] < arr[minIdx]) {
                         minIdx = j;
-                        updateExp(id, `Novo menor encontrado: <span class="h-purple">${arr[minIdx]}</span>!`);
+                        updateExp(id, `Novo menor: <span class="h-purple">${arr[minIdx]}</span>!`);
                         render(id, arr, { active: [j], sorted, minIdx });
                         await sleep();
                     }
@@ -396,11 +428,9 @@
 
         async function insertionSort(arr, id, session) {
             const start = startTimer(id, session);
-            let n = arr.length;
-            let sorted = [0];
+            let n = arr.length; let sorted = [0];
             for (let i = 1; i < n; i++) {
-                let key = arr[i];
-                let j = i - 1;
+                let key = arr[i]; let j = i - 1;
                 updateExp(id, `Pegamos o <span class="highlight">${key}</span> para inserir na ordem.`);
                 render(id, arr, { active: [i], sorted });
                 await sleep();
@@ -409,8 +439,7 @@
                     updateExp(id, `Movendo <span class="highlight">${arr[j]}</span> para abrir espaço.`);
                     arr[j+1] = arr[j];
                     render(id, arr, { active: [j], swapping: [j+1], sorted });
-                    j--;
-                    await sleep();
+                    j--; await sleep();
                 }
                 arr[j+1] = key;
                 sorted = Array.from({length: i+1}, (_, k) => k);
